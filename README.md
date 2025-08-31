@@ -1,22 +1,70 @@
-# COVID-19 Health Protocol Monitoring System  
+# COVID-19 Vision Monitoring System
 
-## 📖 Project Overview
-This project implements a **computer vision system** to monitor COVID-19 health protocols in indoor public spaces.  
-The system can:  
-- Detect humans in video sequences.  
-- Estimate approximate distances between people to check **social distancing**.  
-- Detect whether individuals are wearing **face masks**.  
-- Identify violations of COVID-19 protocols (e.g., no mask + too close).  
+Introducing the COVID-19 Vision Monitoring System, developed as part of the Computer Vision course at IU International University of Applied Sciences.
 
 ---
 
-## 🛠️ Technologies Used
-- **Python 3.10+**
-- [OpenCV](https://opencv.org/) (image processing & video handling)  
-- [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics) (SoA human detection)  
-- Pretrained **Mask Detection Model** (fine-tuned on public datasets)  
-- NumPy, Matplotlib (data processing & visualization)
+## What is COVID-19 Vision Monitoring System? 
+This application is a Command Line Interface (CLI) tool programmed in Python to help monitor compliance with COVID-19 protocols in indoor public spaces. It allows users to:
+- Detect humans in a video stream.
+- Detect if individuals are wearing a mask.
+- Estimate social distancing between people.
+- Evaluate risk levels (Safe / High Risk) based on mask usage and proximity.
+- Save annotated videos showing mask compliance and social distance violations.
+
+The interactive CLI and video output make monitoring COVID-19 protocols simple and accessible.
 
 ---
 
-## 📂 Project Structure
+## How to Install It?
+1) Clone the Repository
+```bash
+git clone https://github.com/RaghadIU/covid19_vision_system.git
+```
+```bash
+cd covid19_vision_system
+```
+2) Create and activate a virtual environment
+```bash
+python -m venv venv
+```
+```bash
+venv\Scripts\activate
+```
+3) Install Python Dependencies 
+Make sure you have Python 3.7+ installed. Then, run:
+```bash
+pip install -r requirements.txt
+```
+
+![Mask Detection](images/11.png)
+
+
+## Mask detection , run:   
+```bash
+python -m mask_detection.mask_detector --source "videos/sample1.mp4" --out "outputs/mask_out.mp4" --view
+```
+
+![ Social distance estimator](images/22.png)
+
+
+## Social distance estimator, run:   
+```bash
+python social_distance/distance_estimator.py --source "videos/sample2.mp4" --out "outputs/distance_out.mp4" --distance_factor 1.5 --view
+```
+
+
+![Human detection ](images/33.png)
+
+## Human detection , run:   
+```bash
+python human_detection/human_detector.py --source "videos/sample3.mp4" --out "outputs/human_out.mp4" --view
+```
+
+![Covid19 monitor](images/44.png)
+
+## Covid19 monitor , run:   
+```bash
+python covid19_monitor/covid19_monitor.py --source "videos/sample4.mp4" --out "outputs/monitor_out.mp4" --view
+```
+
