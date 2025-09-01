@@ -5,14 +5,14 @@ Introducing the COVID-19 Vision Monitoring System, developed as part of the Comp
 ---
 
 ## What is COVID-19 Vision Monitoring System? 
-This application is a Command Line Interface (CLI) tool programmed in Python to help monitor compliance with COVID-19 protocols in indoor public spaces. It allows users to:
+This tool help with monitor compliance with COVID-19 protocols in indoor public spaces. It allows users to:
 - Detect humans in a video stream.
 - Detect if individuals are wearing a mask.
 - Estimate social distancing between people.
 - Evaluate risk levels (Safe / High Risk) based on mask usage and proximity.
 - Save annotated videos showing mask compliance and social distance violations.
 
-The interactive CLI and video output make monitoring COVID-19 protocols simple and accessible.
+video output make monitoring COVID-19 protocols simple and accessible.
 
 ---
 
