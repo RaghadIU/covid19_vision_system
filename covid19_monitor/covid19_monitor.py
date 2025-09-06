@@ -1,149 +1,176 @@
-import sys, os, math, argparse, cv2
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import os
+import math
+import cv2
+import pandas as pd
+from ultralytics import YOLO
+from facenet_pytorch import MTCNN
+import numpy as np
 
-from mask_detection.mask_detector import MaskDetector
-from human_detection.human_detector import HumanDetector
-import argparse
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--source", required=True)
-parser.add_argument("--out", default="outputs/output_video.mp4")
-parser.add_argument("--human_model", default="models/yolov8m.pt")
-parser.add_argument("--mask_model", default="models/mask_yolov8n.pt")
-parser.add_argument("--device", default=None)
-parser.add_argument("--view", action="store_true")
-args = parser.parse_args()
+output_dir = r"C:\Users\HP\Desktop\covid19_vision_sysrem_computervision\outputs"
+os.makedirs(output_dir, exist_ok=True)
 
-source_path = args.source
-out_path = args.out
 
-def ensure_dir(path):
-    if not os.path.exists(path):
-        os.makedirs(path)
+human_model_path = r"C:\Users\HP\Desktop\covid19_vision_sysrem_computervision\models\yolov8m.pt"
+mask_model_path = r"C:\Users\HP\Desktop\covid19_vision_sysrem_computervision\models\mask_yolov8n.pt"
 
-def draw_box(frame, x1, y1, x2, y2, color=(0,0,0), thickness=1):
+mask_conf_thresh = 0.6
+safe_distance_px = 50
+
+
+def draw_box(frame, x1, y1, x2, y2, color=(0,0,0), thickness=2):
     cv2.rectangle(frame, (x1, y1), (x2, y2), color, thickness)
 
-class SocialDistanceEstimator:
-    def get_center(self, box):
-        x1, y1, x2, y2 = box
-        return int((x1 + x2)/2), int((y1 + y2)/2)
+def get_center(box):
+    x1, y1, x2, y2 = box
+    return (int((x1+x2)/2), int((y1+y2)/2))
 
-def run_video(source, output_path, human_model="models/yolov8m.pt",
-              mask_model_path="models/mask_yolov8n.pt", device=None, view=False):
 
-    cap = cv2.VideoCapture(source)
-    if not cap.isOpened():
-        raise RuntimeError(f"Cannot open source {source}")
+class HumanDetector:
+    def __init__(self, model_name=human_model_path):
+        self.model = YOLO(model_name)
+    def infer_frame(self, frame):
+        results = self.model(frame)[0]
+        boxes = []
+        for box, cls in zip(results.boxes.xyxy.cpu().numpy(), results.boxes.cls.cpu().numpy()):
+            if int(cls) == 0:  # class 0 = person
+                boxes.append([int(box[0]), int(box[1]), int(box[2]), int(box[3])])
+        return boxes
+
+
+class MaskDetector:
+    def __init__(self, model_path=mask_model_path):
+        self.model = YOLO(model_path)
+    def detect(self, face_crop, conf_thresh=mask_conf_thresh):
+        results = self.model(face_crop)[0]
+        for box, cls, conf in zip(results.boxes.xyxy.cpu().numpy(),
+                                  results.boxes.cls.cpu().numpy(),
+                                  results.boxes.conf.cpu().numpy()):
+            label = self.model.names[int(cls)]
+            if conf >= conf_thresh:
+                return "Mask" if "Mask" in label else "No Mask"
+        return "No Mask"
+
+
+def process_video(video_path):
+    video_name = os.path.splitext(os.path.basename(video_path))[0]
+    out_video_path = os.path.join(output_dir, f"{video_name}_output.mp4")
+    cap = cv2.VideoCapture(video_path)
 
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
+    writer = cv2.VideoWriter(out_video_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width,height))
 
-    ensure_dir(os.path.dirname(output_path) or ".")
-    writer = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (width,height))
+    human_detector = HumanDetector()
+    mask_detector = MaskDetector()
+    mtcnn = MTCNN(keep_all=True)
 
-    human_detector = HumanDetector(model_name=human_model, device=device)
-    mask_detector = MaskDetector(model_path=mask_model_path)
-    distance_estimator = SocialDistanceEstimator()
+    stats = []
 
     while True:
         ret, frame = cap.read()
         if not ret:
             break
 
-        
         person_boxes = human_detector.infer_frame(frame)
-        face_boxes = []
-        masks = []
+        mask_labels = []
 
-        for (x1, y1, x2, y2) in person_boxes:
-            
-            face_x1 = x1 + int((x2-x1)*0.15)
-            face_x2 = x2 - int((x2-x1)*0.15)
-            face_y1 = y1
-            face_y2 = y1 + int((y2-y1)*0.6)  
-            face_boxes.append((face_x1, face_y1, face_x2, face_y2))
+        faces = mtcnn(frame)
+        if faces is not None:
+            for face in faces:
+                x1, y1, x2, y2 = [int(v) for v in face.tolist()]
+                face_crop = frame[y1:y2, x1:x2]
+                label = mask_detector.detect(face_crop)
+                mask_labels.append((x1, y1, x2, y2, label))
+                color = (0,255,0) if label=="Mask" else (0,0,255)
+                draw_box(frame, x1, y1, x2, y2, color=color, thickness=2)
+                cv2.putText(frame, label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
-            face_crop = frame[face_y1:face_y2, face_x1:face_x2]
-            mask_result = mask_detector.detect(face_crop)
 
-            
-            mask_label = "no Mask" if any(d['label']=='no Mask' for d in mask_result) else "Mask"
-            masks.append(mask_label)
-
-        
-        centers = [distance_estimator.get_center(b) for b in face_boxes]
-        closest_distances = []
-        for i, c1 in enumerate(centers):
-            min_dist = float('inf')
-            for j, c2 in enumerate(centers):
-                if i == j:
-                    continue
-                dx = c1[0]-c2[0]
-                dy = c1[1]-c2[1]
+        centers = [get_center(b[:4]) for b in mask_labels]
+        n = len(centers)
+        for i in range(n):
+            for j in range(i+1, n):
+                dx = centers[i][0]-centers[j][0]
+                dy = centers[i][1]-centers[j][1]
                 dist = math.sqrt(dx*dx + dy*dy)
-                if dist < min_dist:
-                    min_dist = dist
-            closest_distances.append(min_dist)
+                color = (0,255,0) if dist >= safe_distance_px else (0,0,255)
+                cv2.line(frame, centers[i], centers[j], color, 2)
 
-        
-        for i, (box, mask_label) in enumerate(zip(face_boxes, masks)):
-            x1, y1, x2, y2 = box
+        stats.append({
+            "frame": int(cap.get(cv2.CAP_PROP_POS_FRAMES)),
+            "num_people": len(person_boxes),
+            "mask_on": sum(1 for l in mask_labels if l[4]=="Mask"),
+            "mask_off": sum(1 for l in mask_labels if l[4]=="No Mask")
+        })
 
-           
-            color = (0,0,255) if mask_label=="no Mask" else (0,255,0)
-
-            
-            draw_box(frame, x1, y1, x2, y2, color=color, thickness=2)
-
-           
-            safe_distance_threshold = 50  
-            if closest_distances[i] < safe_distance_threshold:
-                risk = "High Risk"
-                risk_color = (0,0,255)  
-            else:
-                risk = "Safe"
-                risk_color = (0,255,0)  
-
-           
-            info_x1 = x2 + 5
-            info_y1 = y1
-            info_x2 = x2 + 120
-            info_y2 = y1 + 60
-            overlay = frame.copy()
-            cv2.rectangle(overlay, (info_x1, info_y1), (info_x2, info_y2), (0,0,0), -1)
-            alpha = 0.4
-            cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
-
-           
-            cv2.rectangle(frame, (info_x1+5, info_y1+5), (info_x1+20, info_y1+20),
-                          (0,0,255) if mask_label=="no Mask" else (0,255,0), -1)
-            cv2.rectangle(frame, (info_x1+5, info_y1+25), (info_x1+20, info_y1+40), (0,0,0), -1)
-            cv2.rectangle(frame, (info_x1+5, info_y1+45), (info_x1+20, info_y1+60), risk_color, -1)
-
-            
-            cv2.putText(frame, f"Mask: {mask_label}", (info_x1+25, info_y1+18), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255),1)
-            cv2.putText(frame, f"Dist: {closest_distances[i]:.1f}px", (info_x1+25, info_y1+35), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255),1)
-            cv2.putText(frame, f"Risk: {risk}", (info_x1+25, info_y1+55), cv2.FONT_HERSHEY_SIMPLEX,0.4,(255,255,255),1)
+     
+        cv2.imshow("COVID-19 Monitor", frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
         writer.write(frame)
-        if view:
-            cv2.imshow("COVID-19 Monitoring", frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
 
     cap.release()
     writer.release()
-    if view:
-        cv2.destroyAllWindows()
-    return output_path
+    cv2.destroyAllWindows()
+
+    csv_path = os.path.join(output_dir, f"{video_name}_stats.csv")
+    pd.DataFrame(stats).to_csv(csv_path, index=False)
+    print(f"[OK] Saved video: {out_video_path}")
+    print(f"[OK] Saved CSV: {csv_path}")
+
+    return out_video_path
 
 
-def main():
-    out = run_video(args.source, args.out,
-                    args.human_model, args.mask_model, args.device, args.view)
-    print(f"[OK] Saved: {out}")
+def merge_videos(video_paths, output_path=os.path.join(output_dir,"final_merged_video.mp4")):
+    caps = [cv2.VideoCapture(v) for v in video_paths]
+    widths = [int(c.get(cv2.CAP_PROP_FRAME_WIDTH)) for c in caps]
+    heights = [int(c.get(cv2.CAP_PROP_FRAME_HEIGHT)) for c in caps]
+    fps_list = [c.get(cv2.CAP_PROP_FPS) or 25.0 for c in caps]
 
-if __name__=="__main__":
-    main()
+    max_width = max(widths)
+    max_height = max(heights)
+    fps = min(fps_list)
+    writer = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (max_width, max_height))
+
+    for cap in caps:
+        w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            scale_w = max_width / w
+            scale_h = max_height / h
+            scale = min(scale_w, scale_h)
+            new_w = int(w * scale)
+            new_h = int(h * scale)
+            resized_frame = cv2.resize(frame, (new_w, new_h))
+            canvas = np.zeros((max_height, max_width, 3), dtype=np.uint8)
+            x_offset = (max_width - new_w) // 2
+            y_offset = (max_height - new_h) // 2
+            canvas[y_offset:y_offset+new_h, x_offset:x_offset+new_w] = resized_frame
+            writer.write(canvas)
+            cv2.imshow("Merged Video", canvas)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        cap.release()
+    writer.release()
+    cv2.destroyAllWindows()
+    print(f"[OK] Merged video saved at: {output_path}")
+
+
+if __name__ == "__main__":
+
+    video_list = [
+        os.path.join(output_dir, "test1_output.mp4"),
+        os.path.join(output_dir, "test2_output.mp4"),
+        os.path.join(output_dir, "test3_output.mp4")
+    ]
+
+    processed_videos = []
+    for v in video_list:
+        processed_videos.append(process_video(v))  
+    merge_videos(processed_videos)  
