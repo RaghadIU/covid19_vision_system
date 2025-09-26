@@ -1,5 +1,0 @@
-train: C:/Users/HP/Desktop/covid19_vision_sysrem_computervision/mask_dataset/images/train
-val: C:/Users/HP/Desktop/covid19_vision_sysrem_computervision/mask_dataset/images/val
-
-nc: 2
-names: ['Mask', 'NoMask']

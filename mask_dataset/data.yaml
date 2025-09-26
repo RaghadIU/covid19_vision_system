@@ -1,0 +1,6 @@
+train: C:/Users/HP/Desktop/covid19_vision_sysrem_computervision/mask_dataset/images/train
+val: C:/Users/HP/Desktop/covid19_vision_sysrem_computervision/mask_dataset/images/val
+
+nc: 2  # عدد الفئات
+names: ['without_mask', 'with_mask']  # أسماء الفئات
+                  
