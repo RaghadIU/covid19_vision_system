@@ -61,7 +61,7 @@ python social_distance/distance_estimator.py --source "videos/sample2.mp4" --out
 python human_detection/human_detector.py --source "videos/sample3.mp4" --out "outputs/human_out.mp4" --view
 ```
 
-![multi_model_mask_distance](images/44.png)
+
 
 ## few people 
 ![few people ](images/4.png)
