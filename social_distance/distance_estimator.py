@@ -53,7 +53,7 @@ def check_violations(boxes, min_distance_px=150, use_cm=False):
             if use_cm:
                 h_avg_px = (heights[i] + heights[j]) / 2
                 if h_avg_px > 0:
-                    px_per_cm = h_avg_px / 170.0  # تقريب طول الشخص 170 سم
+                    px_per_cm = h_avg_px / 170.0  
                     dist_display = dist_px / px_per_cm
 
             if dist_display < min_dist:

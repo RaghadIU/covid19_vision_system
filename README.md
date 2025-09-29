@@ -37,7 +37,7 @@ Make sure you have Python 3.7+ installed. Then, run:
 pip install -r requirements.txt
 ```
 
-![Mask Detection](images/11.png)
+![Mask Detection](images/1.png)
 
 
 ## Mask detection , run:   
@@ -45,7 +45,7 @@ pip install -r requirements.txt
 python -m mask_detection.mask_detector --source "videos/sample1.mp4" --out "outputs/mask_out.mp4" --view
 ```
 
-![ Social distance estimator](images/22.png)
+![ Social distance estimator](images/2.png)
 
 
 ## Social distance estimator, run:   
@@ -54,17 +54,28 @@ python social_distance/distance_estimator.py --source "videos/sample2.mp4" --out
 ```
 
 
-![Human detection ](images/33.png)
+![Human detection ](images/3.png)
 
 ## Human detection , run:   
 ```bash
 python human_detection/human_detector.py --source "videos/sample3.mp4" --out "outputs/human_out.mp4" --view
 ```
 
-![Covid19 monitor](images/44.png)
+![multi_model_mask_distance](images/44.png)
 
-## Covid19 monitor , run:   
+## few people 
+![few people ](images/4.png)
+
+## medium people 
+![medium people ](images/5.png)
+
+## many people 
+![many people ](images/6.png)
+
+
+## multi_model_mask_distance , run:   
 ```bash
-python covid19_monitor/covid19_monitor.py --source "videos/sample4.mp4" --out "outputs/monitor_out.mp4" --view
+python multi_model_mask_distance.py
+
 ```
 
