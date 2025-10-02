@@ -38,7 +38,7 @@ pip install -r requirements.txt
 ```
 
 ![Mask Detection](images/1.png)
-
+(https://www.pexels.com/video/people-walking-on-sidewalk-5330835/)
 
 ## Mask detection , run:   
 ```bash
@@ -46,7 +46,7 @@ python -m mask_detection.mask_detector --source "videos/sample1.mp4" --out "outp
 ```
 
 ![ Social distance estimator](images/2.png)
-
+(https://www.pexels.com/video/black-and-white-video-of-people-853889/)
 
 ## Social distance estimator, run:   
 ```bash
@@ -55,7 +55,7 @@ python social_distance/distance_estimator.py --source "videos/sample2.mp4" --out
 
 
 ![Human detection ](images/3.png)
-
+(https://www.istockphoto.com/video/a-lot-people-wear-hygienic-mask-for-protect-pm2-5-dust-and-corona-virus-gm1207104496-348394435)
 ## Human detection , run:   
 ```bash
 python human_detection/human_detector.py --source "videos/sample3.mp4" --out "outputs/human_out.mp4" --view
@@ -65,13 +65,13 @@ python human_detection/human_detector.py --source "videos/sample3.mp4" --out "ou
 
 ## few people 
 ![few people ](images/4.png)
-
+(https://www.istockphoto.com/video/senior-couple-enjoying-taking-a-walk-in-green-city-gm2223072521-639304795)
 ## medium people 
 ![medium people ](images/5.png)
-
+(https://www.istockphoto.com/video/grandparents-and-grandchildren-walking-during-covid-19-pandemic-gm1286451135-382951674)
 ## many people 
 ![many people ](images/6.png)
-
+(https://www.istockphoto.com/video/crowd-of-people-commuting-to-work-gm1410259825-460481415)
 
 ## multi_model_mask_distance , run:   
 ```bash
