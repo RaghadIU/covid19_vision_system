@@ -1,6 +1,6 @@
 import cv2
 
-# اسم الفيديو
+#We applied this code to all the videos.(test1.mp4,test2.mp4,test3.mp4)
 VIDEO_PATH = "videos/test3.mp4"
 points = []
 
@@ -21,7 +21,6 @@ cv2.setMouseCallback("Select Points", click_event)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
-# حفظ النقاط في ملف نصي
 with open("video_points.txt", "w") as f:
     for p in points:
         f.write(f"{p[0]},{p[1]}\n")

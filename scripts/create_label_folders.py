@@ -10,4 +10,4 @@ folders = [
 for f in folders:
     os.makedirs(f, exist_ok=True)
 
-print("✅ Labels folders created successfully!")
+print(" Labels folders created successfully!")

@@ -21,7 +21,7 @@ def train_mask_model():
     if not os.path.exists(data_yaml):
         raise FileNotFoundError(f"data.yaml not found in {args.mask_dataset}")
     
-    model = YOLO("yolov8n.pt")  # استخدم النموذج الصغير YOLOv8n
+    model = YOLO("yolov8n.pt") 
     print("[INFO] Starting training on mask dataset...")
     model.train(
         data=data_yaml,

@@ -1,19 +1,16 @@
 import cv2
 import os
 
-# قائمة الفيديوهات
 VIDEOS = [
     "C:/Users/HP/Desktop/covid19_vision_sysrem_computervision/videos/test1.mp4",
     "C:/Users/HP/Desktop/covid19_vision_sysrem_computervision/videos/test2.mp4",
     "C:/Users/HP/Desktop/covid19_vision_sysrem_computervision/videos/test3.mp4"
 ]
 
-# الفترة التي تريدها بالثواني لكل فيديو
-# يمكن تعديل start_sec و end_sec حسب كل فيديو
 TIME_RANGES = [
-    (0, 7),   # الفيديو 1: من الثانية 0 إلى 30
-    (7, 10),   # الفيديو 2: من الثانية 5 إلى 35
-    (4, 6)   # الفيديو 3: من الثانية 10 إلى 40
+    (0, 7),  
+    (7, 10),  
+    (4, 6)   
 ]
 
 for idx, VIDEO_INPUT in enumerate(VIDEOS):
@@ -25,7 +22,6 @@ for idx, VIDEO_INPUT in enumerate(VIDEOS):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 
-    # حفظ بنفس الاسم مع _short
     base_name = os.path.splitext(os.path.basename(VIDEO_INPUT))[0]
     VIDEO_OUTPUT = f"C:/Users/HP/Desktop/covid19_vision_sysrem_computervision/videos/{base_name}_short.mp4"
 
@@ -45,6 +41,6 @@ for idx, VIDEO_INPUT in enumerate(VIDEOS):
 
     cap.release()
     out.release()
-    print(f"تم قص الفيديو وحفظه: {VIDEO_OUTPUT}")
+    print(f"Done : {VIDEO_OUTPUT}")
 
-print("تم الانتهاء من كل الفيديوهات!")
+print("Done")
