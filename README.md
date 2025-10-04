@@ -1,41 +1,56 @@
-# COVID-19 Vision Monitoring System
+#  COVID-19 Vision Monitoring System  
 
-Introducing the COVID-19 Vision Monitoring System, developed as part of the Computer Vision course at IU International University of Applied Sciences.
-
----
-
-## What is COVID-19 Vision Monitoring System? 
-This tool help with monitor compliance with COVID-19 protocols in indoor public spaces. It allows users to:
-- Detect humans in a video stream.
-- Detect if individuals are wearing a mask.
-- Estimate social distancing between people.
-- Evaluate risk levels (Safe / High Risk) based on mask usage and proximity.
-- Save annotated videos showing mask compliance and social distance violations.
-
-video output make monitoring COVID-19 protocols simple and accessible.
+**Developed as part of the Computer Vision course at IU International University of Applied Sciences.**
 
 ---
 
-## How to Install It?
-1) Clone the Repository
+##  Overview
+The **COVID-19 Vision Monitoring System** is a computer vision tool designed to monitor compliance with COVID-19 safety protocols in indoor public spaces.  
+It helps users automatically:
+-  Detect humans in a video stream.  
+-  Identify if individuals are wearing face masks.  
+-  Estimate social distancing between people.  
+-  Evaluate risk levels (Safe / High Risk) based on mask usage and proximity.  
+-  Save annotated videos showing mask compliance and social distance violations.
+
+This system makes monitoring COVID-19 protocols **simple, efficient, and fully automated**.
+
+---
+
+##Installation
+
+###  Clone the Repository
 ```bash
 git clone https://github.com/RaghadIU/covid19_vision_system.git
 ```
 ```bash
 cd covid19_vision_system
 ```
-2) Create and activate a virtual environment
+
+### Create and activate a virtual environment
 ```bash
 python -m venv venv
 ```
 ```bash
 venv\Scripts\activate
 ```
-3) Install Python Dependencies 
+### Install Python Dependencies 
 Make sure you have Python 3.7+ installed. Then, run:
 ```bash
 pip install -r requirements.txt
 ```
+
+### Model Weights
+
+Place the trained YOLO model weights inside the models/ folder:
+
+1) yolov8m.pt → for human detection
+
+2) mask_yolov8n.pt → for mask detection
+
+3) last.pt → for combined tasks
+
+
 
 ![Mask Detection](images/1.png)
 [Video Source](https://www.pexels.com/video/people-walking-on-sidewalk-5330835/)
@@ -78,4 +93,10 @@ python human_detection/human_detector.py --source "videos/sample3.mp4" --out "ou
 python multi_model_mask_distance.py
 
 ```
+### Output
 
+- Processed videos are saved in the outputs/ folder.
+
+- Each video shows bounding boxes, distance lines, and mask status labels.
+
+- The system can optionally export logs (CSV) summarizing compliance statistics.
