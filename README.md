@@ -60,7 +60,7 @@ Place the trained YOLO model weights inside the models/ folder:
 python -m mask_detection.mask_detector --source "videos/sample1.mp4" --out "outputs/mask_out.mp4" --view
 ```
 
-![ Social distance estimator](images/2.png)
+![ Social distance estimator](images/3.png)
 [Video Source](https://www.pexels.com/video/black-and-white-video-of-people-853889/)
 
 ## Social distance estimator, run:   
@@ -69,7 +69,7 @@ python social_distance/distance_estimator.py --source "videos/sample2.mp4" --out
 ```
 
 
-![Human detection ](images/3.png)
+![Human detection ](images/2.png)
 [Video Source](https://www.istockphoto.com/video/a-lot-people-wear-hygienic-mask-for-protect-pm2-5-dust-and-corona-virus-gm1207104496-348394435)
 ## Human detection , run:   
 ```bash
