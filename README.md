@@ -17,7 +17,7 @@ This system makes monitoring COVID-19 protocols **simple, efficient, and fully a
 
 ---
 
-##Installation
+## Installation
 
 ###  Clone the Repository
 ```bash
